@@ -81,10 +81,13 @@ def save_video(images, video_path, fps=30, crf=17):
         writer.write(images)
 
 
-def get_writer(video_path, fps=30, crf=17):
+def get_writer(video_path, fps=30, crf=17, width=None, height=None):
     """remember to .close()"""
     writer = iio.imopen(video_path, "w", plugin="pyav")
     writer.init_video_stream("libx264", fps=fps)
+    if width is not None and height is not None:
+        writer._video_stream.width = width
+        writer._video_stream.height = height
     writer._video_stream.options = {"crf": str(crf)}
     return writer
 

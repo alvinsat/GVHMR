@@ -5,6 +5,7 @@ from hmr4d.utils.pylogger import Log
 from hmr4d.configs import MainStore, builds
 
 from hmr4d.utils.geo.hmr_cam import normalize_kp2d
+from hmr4d.utils.net_utils import to_cuda
 
 
 class DemoPL(pl.LightningModule):
@@ -34,7 +35,7 @@ class DemoPL(pl.LightningModule):
             "cam_angvel": data["cam_angvel"][None],
             "f_imgseq": data["f_imgseq"][None],
         }
-        batch = {k: v.cuda() for k, v in batch.items()}
+        batch = to_cuda(batch)
         outputs = self.pipeline.forward(batch, train=False, postproc=True, static_cam=static_cam)
 
         pred = {

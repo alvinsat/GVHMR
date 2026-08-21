@@ -76,10 +76,20 @@ def detach_to_cpu(in_dict):
     return recursive_detach(in_dict, to_cpu=True)
 
 
+def get_torch_device():
+    """Select Intel XPU first, then CUDA, otherwise CPU."""
+    if hasattr(torch, "xpu") and torch.xpu.is_available():
+        return torch.device("xpu")
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    return torch.device("cpu")
+
+
 def to_cuda(data):
-    """Move data in the batch to cuda(), carefully handle data that is not tensor"""
+    """Move data to the available accelerator, carefully handling non-tensors."""
+    device = get_torch_device()
     if isinstance(data, torch.Tensor):
-        return data.cuda()
+        return data.to(device)
     elif isinstance(data, dict):
         return {k: to_cuda(v) for k, v in data.items()}
     elif isinstance(data, list):

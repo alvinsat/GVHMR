@@ -23,8 +23,14 @@ class Tracker:
 
     def track(self, video_path):
         track_history = []
+        if hasattr(torch, "xpu") and torch.xpu.is_available():
+            device = "xpu:0"
+        elif torch.cuda.is_available():
+            device = "cuda:0"
+        else:
+            device = "cpu"
         cfg = {
-            "device": "cuda",
+            "device": device,
             "conf": 0.5,  # default 0.25, wham 0.5
             "classes": 0,  # human
             "verbose": False,
